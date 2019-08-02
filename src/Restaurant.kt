@@ -1,6 +1,5 @@
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
-import kotlin.system.measureTimeMillis
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 fun main() = runBlocking(CoroutineName("main")) {
@@ -10,7 +9,7 @@ fun main() = runBlocking(CoroutineName("main")) {
 
 fun getOrders() = listOf<Order>(
     Order.Hamburger(MeatDoneness.RARE),
-    Order.Hamburger(MeatDoneness.MEDUIM),
+    Order.Hamburger(MeatDoneness.MEDIUM),
     Order.Hamburger(MeatDoneness.WELL_DONE)
 )
 
