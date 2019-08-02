@@ -1,4 +1,5 @@
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +24,7 @@ Serve MEDIUM Hamburger
 Serve WELL_DONE Hamburger
  */
 
-fun prepareDishes(orders: List<Order>) {
+suspend fun prepareDishes(orders: List<Order>) {
     for (order in orders) {
         when (order) {
             is Order.Hamburger -> {
@@ -37,19 +38,27 @@ fun prepareDishes(orders: List<Order>) {
     }
 }
 
-fun grillMeat(doneness: MeatDoneness): Meat {
+suspend fun grillMeat(doneness: MeatDoneness): Meat {
+    when (doneness) {
+        MeatDoneness.RARE -> delay(100)
+        MeatDoneness.MEDIUM -> delay(200)
+        MeatDoneness.WELL_DONE -> delay(300)
+    }
     return Meat(doneness)
 }
 
-fun getBread(): Bread {
+suspend fun getBread(): Bread {
+    delay(50)
     return Bread()
 }
 
-fun getToppings(): Toppings {
+suspend fun getToppings(): Toppings {
+    delay(50)
     return Toppings()
 }
 
-fun makeHamburger(order: Order.Hamburger, meat: Meat, bread: Bread, toppings: Toppings): Dish.Hamburguer {
+suspend fun makeHamburger(order: Order.Hamburger, meat: Meat, bread: Bread, toppings: Toppings): Dish.Hamburguer {
+    delay(10)
     return Dish.Hamburguer(order, meat, bread, toppings)
 }
 
