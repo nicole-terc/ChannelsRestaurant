@@ -1,11 +1,17 @@
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.system.measureTimeMillis
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 fun main() = runBlocking(CoroutineName("main")) {
     println("Restaurant is open")
-    prepareDishes(getOrders())
+    val orders = getOrders()
+
+    //Each cook is a coroutine
+    val cook1 = launch { prepareDishes("Cook 1", orders) }
+    val cook2 = launch { prepareDishes("Cook 2", orders) }
 }
 
 fun getOrders() = listOf<Order>(
@@ -15,24 +21,34 @@ fun getOrders() = listOf<Order>(
 )
 
 /*
-All steps are executed one after the other
-prints:
+Cooks work concurrently
 
 Restaurant is open
-Serve RARE Hamburger
-Serve MEDIUM Hamburger
-Serve WELL_DONE Hamburger
+Cook 1 is preparing RARE Hamburger Order
+Cook 2 is preparing RARE Hamburger Order
+Cook 1 is serving RARE Hamburger
+Cook 1 is preparing MEDIUM Hamburger Order
+Cook 2 is serving RARE Hamburger
+Cook 2 is preparing MEDIUM Hamburger Order
+Cook 1 is serving MEDIUM Hamburger
+Cook 1 is preparing WELL_DONE Hamburger Order
+Cook 2 is serving MEDIUM Hamburger
+Cook 2 is preparing WELL_DONE Hamburger Order
+Cook 1 is serving WELL_DONE Hamburger
+Cook 2 is serving WELL_DONE Hamburger
  */
 
-suspend fun prepareDishes(orders: List<Order>) {
+suspend fun prepareDishes(cook: String, orders: List<Order>) {
     for (order in orders) {
+        println("$cook is preparing $order")
+
         when (order) {
             is Order.Hamburger -> {
                 val meat = grillMeat(order.meatDoneness)
                 val bread = getBread()
                 val toppings = getToppings()
                 val hamburger = makeHamburger(order, meat, bread, toppings)
-                println("Serve $hamburger")
+                println("$cook is serving $hamburger")
             }
         }
     }
