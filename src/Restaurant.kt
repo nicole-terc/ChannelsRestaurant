@@ -4,8 +4,14 @@ import kotlinx.coroutines.runBlocking
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 fun main() = runBlocking(CoroutineName("main")) {
     println("Restaurant is open")
-    prepareDishes(emptyList())
+    prepareDishes(getOrders())
 }
+
+fun getOrders() = listOf<Order>(
+    Order.Hamburger(MeatDoneness.RARE),
+    Order.Hamburger(MeatDoneness.MEDUIM),
+    Order.Hamburger(MeatDoneness.WELL_DONE)
+)
 
 fun prepareDishes(orders: List<Order>) {
     for (order in orders) {
