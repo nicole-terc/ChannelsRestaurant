@@ -1,6 +1,6 @@
 enum class MeatDoneness {
     RARE,
-    MEDUIM,
+    MEDIUM,
     WELL_DONE
 }
 
