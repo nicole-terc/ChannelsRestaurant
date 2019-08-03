@@ -1,17 +1,27 @@
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.system.measureTimeMillis
 
 @kotlinx.coroutines.ExperimentalCoroutinesApi
 fun main() = runBlocking(CoroutineName("main")) {
     println("Restaurant is open")
     val orders = getOrders()
 
+    val ordersChannel = Channel<Order>()
+
+    launch {
+        for (order in orders) {
+            ordersChannel.send(order)
+        }
+        ordersChannel.close()
+    }
+
     //Each cook is a coroutine
-    val cook1 = launch { prepareDishes("Cook 1", orders) }
-    val cook2 = launch { prepareDishes("Cook 2", orders) }
+    val cook1 = launch { prepareDishes("Cook 1", ordersChannel) }
+    val cook2 = launch { prepareDishes("Cook 2", ordersChannel) }
 }
 
 fun getOrders() = listOf<Order>(
@@ -21,25 +31,19 @@ fun getOrders() = listOf<Order>(
 )
 
 /*
-Cooks work concurrently
+Cooks work concurrently, orders aren't repeated
 
 Restaurant is open
 Cook 1 is preparing RARE Hamburger Order
-Cook 2 is preparing RARE Hamburger Order
-Cook 1 is serving RARE Hamburger
-Cook 1 is preparing MEDIUM Hamburger Order
-Cook 2 is serving RARE Hamburger
 Cook 2 is preparing MEDIUM Hamburger Order
-Cook 1 is serving MEDIUM Hamburger
+Cook 1 is serving RARE Hamburger
 Cook 1 is preparing WELL_DONE Hamburger Order
 Cook 2 is serving MEDIUM Hamburger
-Cook 2 is preparing WELL_DONE Hamburger Order
 Cook 1 is serving WELL_DONE Hamburger
-Cook 2 is serving WELL_DONE Hamburger
  */
 
-suspend fun prepareDishes(cook: String, orders: List<Order>) {
-    for (order in orders) {
+suspend fun prepareDishes(cook: String, ordersChannel: ReceiveChannel<Order>) {
+    for (order in ordersChannel) {
         println("$cook is preparing $order")
 
         when (order) {
@@ -61,6 +65,7 @@ suspend fun grillMeat(doneness: MeatDoneness): Meat {
         MeatDoneness.WELL_DONE -> delay(300)
     }
     return Meat(doneness)
+
 }
 
 suspend fun getBread(): Bread {
